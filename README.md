@@ -11,6 +11,7 @@ Runs in any modern browser on phone or computer. Built with three.js (r128, bund
 ```
 index.html            page markup and the order the scripts load in
 css/style.css         all styles (HUD, menu, touch controls)
+css/polish.css        button styling and the control-layout editor
 vendor/three.min.js   three.js r128
 assets/sfx/*.mp3      sound effects (replace these to customise sounds)
 js/lib/NN-*.js        function definitions, grouped by topic
@@ -31,6 +32,7 @@ Every `js/lib` file loads before any `js/run` file, so code in one topic can cal
 | 08 | toto-city | toto model, landmarks, posters, processions, blockades, roadworks |
 | 09 | kolkata | Kolkata buses, lorries, trams, street-name boards, Howrah Bridge, crash effects, sound loader |
 | 10 | ui | keyboard, touch controls, menus |
+| 11 | polish | app name, control-layout editor (move and resize each touch button) |
 
 ## Custom sounds
 
@@ -50,6 +52,10 @@ Drop a new file into `assets/sfx/` with the same name to replace a sound. MP3 wo
 | `hiss.mp3` | boost (টান) |
 
 Voice lines can also be recorded in-game from the menu (ভয়েস প্যাক); those stay in the player's browser.
+
+## Touch control layout
+
+In the pause panel (or the menu) tap **🎛 বোতাম সাজাও**. Drag any button to move it; select one and use the slider (or pinch) to resize it. With nothing selected the slider resizes all buttons. **আগের মতো** resets the layout. The layout is saved on the device.
 
 ## Running locally
 
