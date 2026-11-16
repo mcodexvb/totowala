@@ -37,6 +37,7 @@ Every `js/lib` file loads before any `js/run` file, so code in one topic can cal
 | 10 | ui | keyboard, touch controls, menus |
 | 11 | polish | app name, control-layout editor (move and resize each touch button) |
 | 12 | soundpack | tidy start menu, on-device sound pack, install button |
+| 13 | packzip | sound pack import/export as .zip |
 
 ## Custom sounds
 
@@ -70,6 +71,8 @@ Menu → **সাউন্ড প্যাক** lets each player add their own c
 ```
 
 with the audio files next to it in `assets/pack/`. Slots: `start, pax, paid, boost, crash, hit, fine, chase, caught, over, romeo`. Only put clips here that you have the right to share publicly; film dialogue, TV clips and songs usually belong to someone else.
+
+- **📥 প্যাক ইমপোর্ট / 📤 প্যাক এক্সপোর্ট**: save the whole pack (clips, moments and captions) as one `.zip`, and load it on another phone or share it with friends. A zip contains `pack.json` plus a `sounds/` folder; plain zips of audio files also work and are sorted by file name.
 
 The older line-by-line voice recorder is still available from the sound-pack screen.
 

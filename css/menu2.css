@@ -50,3 +50,4 @@
 .sp-foot{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0 20px}.sp-foot .btn{margin:0!important}
 .m2-fold:not(.open) #mapsvg,.m2-fold:not(.open) #tasks{display:none!important}
 .m2-fh small{margin-left:auto;margin-right:8px}
+.sp-zip{display:flex;gap:6px;margin-top:8px}.sp-zip .btn{flex:1;margin:0!important;font-size:12.5px!important;padding:8px 6px!important}
