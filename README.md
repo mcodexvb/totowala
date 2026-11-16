@@ -12,6 +12,9 @@ Runs in any modern browser on phone or computer. Built with three.js (r128, bund
 index.html            page markup and the order the scripts load in
 css/style.css         all styles (HUD, menu, touch controls)
 css/polish.css        button styling and the control-layout editor
+css/menu2.css         start menu layout and the sound-pack panel
+manifest.webmanifest  app name and icons for installing
+sw.js                 offline cache for the installed app
 vendor/three.min.js   three.js r128
 assets/sfx/*.mp3      sound effects (replace these to customise sounds)
 js/lib/NN-*.js        function definitions, grouped by topic
@@ -33,6 +36,7 @@ Every `js/lib` file loads before any `js/run` file, so code in one topic can cal
 | 09 | kolkata | Kolkata buses, lorries, trams, street-name boards, Howrah Bridge, crash effects, sound loader |
 | 10 | ui | keyboard, touch controls, menus |
 | 11 | polish | app name, control-layout editor (move and resize each touch button) |
+| 12 | soundpack | tidy start menu, on-device sound pack, install button |
 
 ## Custom sounds
 
@@ -51,11 +55,25 @@ Drop a new file into `assets/sfx/` with the same name to replace a sound. MP3 wo
 | `whistle.mp3`, `siren.mp3` | police |
 | `hiss.mp3` | boost (টান) |
 
-Voice lines can also be recorded in-game from the menu (ভয়েস প্যাক); those stay in the player's browser.
+### Sound pack (on the device)
+
+Menu → **সাউন্ড প্যাক** lets each player add their own clips and lines without changing the repo. Everything is stored in the browser (IndexedDB) on that device and is never uploaded.
+
+- **📦 অনেক ফাইল একসাথে যোগ করো**: pick many audio files at once; they are sorted into moments by file name (crash, fail, wow, rizz…). Each clip can be moved to another moment afterwards.
+- Each moment also takes **⬆ ফাইল**, **🎙 রেকর্ড** or **✎ শুধু লেখা** (a text line that pops up as a speech bubble). Audio clips can carry a text line too.
+- Moments: খেলা শুরু, যাত্রী উঠল, ভাড়া পেলাম, টান দিলে, বড় ধাক্কা, মানুষে ধাক্কা, জরিমানা / পুলিশ, পাবলিক তাড়া, ধরা পড়লে, খেলা শেষ, রাস্তার রোমিও.
+
+Please don't commit meme clips, film dialogue or songs to this repo; keep those in your own sound pack.
+
+The older line-by-line voice recorder is still available from the sound-pack screen.
 
 ## Touch control layout
 
 In the pause panel (or the menu) tap **🎛 বোতাম সাজাও**. Drag any button to move it; select one and use the slider (or pinch) to resize it. With nothing selected the slider resizes all buttons. **আগের মতো** resets the layout. The layout is saved on the device.
+
+## Install as an app
+
+On Android/Chrome or desktop Chrome/Edge, the menu shows **⬇ অ্যাপ ইনস্টল**. On iPhone, use Safari's Share button → *Add to Home Screen*. The installed app runs full-screen and works offline after the first load. When files change, bump `VERSION` in `sw.js` so players get the update.
 
 ## Running locally
 
