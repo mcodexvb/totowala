@@ -63,7 +63,13 @@ Menu → **সাউন্ড প্যাক** lets each player add their own c
 - Each moment also takes **⬆ ফাইল**, **🎙 রেকর্ড** or **✎ শুধু লেখা** (a text line that pops up as a speech bubble). Audio clips can carry a text line too.
 - Moments: খেলা শুরু, যাত্রী উঠল, ভাড়া পেলাম, টান দিলে, বড় ধাক্কা, মানুষে ধাক্কা, জরিমানা / পুলিশ, পাবলিক তাড়া, ধরা পড়লে, খেলা শেষ, রাস্তার রোমিও.
 
-Please don't commit meme clips, film dialogue or songs to this repo; keep those in your own sound pack.
+**Default pack (optional):** if the site has `assets/pack/pack.json`, its clips play for everyone by default (players can switch it off in the sound-pack screen, and their own clips are added on top). Format:
+
+```json
+{ "crash": [ { "file": "my-crash.mp3", "text": "optional caption" } ], "over": [ ... ] }
+```
+
+with the audio files next to it in `assets/pack/`. Slots: `start, pax, paid, boost, crash, hit, fine, chase, caught, over, romeo`. Only put clips here that you have the right to share publicly; film dialogue, TV clips and songs usually belong to someone else.
 
 The older line-by-line voice recorder is still available from the sound-pack screen.
 

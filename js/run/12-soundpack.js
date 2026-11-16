@@ -32,11 +32,14 @@ const SP={meta:{},db:null,buf:new Map(),last:0,slotT:{},
   items.forEach((it,i)=>this.meta[it.slot].push({id:ids[i],text:'',name:it.name,audio:true}));this.saveMeta();},
  remove(slot,id){this.meta[slot]=this.meta[slot].filter(x=>x.id!==id);this.saveMeta();this.del(id);},
  count(){let n=0;for(const s in this.meta)n+=this.meta[s].length;return n;},
- async playClip(id,vol){A.init();if(!A.ctx)return;let b=this.buf.get(id);if(!b){const blob=await this.get(id);if(!blob)return;try{const ab=await blob.arrayBuffer();b=await new Promise(r=>A.ctx.decodeAudioData(ab,r,()=>r(null)));}catch(e){b=null;}if(!b)return;this.buf.set(id,b);}
+ async playClip(id,vol,url){A.init();if(!A.ctx)return;let b=this.buf.get(id);if(!b){const blob=url?await fetch(url).then(r=>r.ok?r.blob():null).catch(()=>null):await this.get(id);if(!blob)return;try{const ab=await blob.arrayBuffer();b=await new Promise(r=>A.ctx.decodeAudioData(ab,r,()=>r(null)));}catch(e){b=null;}if(!b)return;this.buf.set(id,b);}
   try{if(this.cur)try{this.cur.stop();}catch(e){}const s=A.ctx.createBufferSource(),g=A.ctx.createGain();s.buffer=b;g.gain.value=vol||1.2;s.connect(g);g.connect(A.master);s.start();this.cur=s;}catch(e){}},
- fire(slot,o){o=o||{};const L=this.meta[slot];if(!L||!L.length)return false;const now=performance.now();if(!o.force&&(now-this.last<(o.gap||2200)||now-(this.slotT[slot]||0)<(o.slotGap||4500)))return false;if(o.p!==undefined&&Math.random()>o.p)return false;
-  this.last=now;this.slotT[slot]=now;const it=pick(L);if(it.text&&G.state==='play'){try{bubble(it.text,o.at||null);}catch(e){}}if(it.audio&&A.on!==false)this.playClip(it.id);return true;}};
+ fire(slot,o){o=o||{};const L=(this.meta[slot]||[]).concat(this.defOn?(this.def[slot]||[]):[]);if(!L.length)return false;const now=performance.now();if(!o.force&&(now-this.last<(o.gap||2200)||now-(this.slotT[slot]||0)<(o.slotGap||4500)))return false;if(o.p!==undefined&&Math.random()>o.p)return false;
+  this.last=now;this.slotT[slot]=now;const it=pick(L);if(it.text&&G.state==='play'){try{bubble(it.text,o.at||null);}catch(e){}}if(it.audio&&A.on!==false)this.playClip(it.id,1.2,it.url);return true;}};
 SP.loadMeta();
+/* optional default pack shipped with the site: assets/pack/pack.json -> {slot:[{file,text}]} */
+SP.def={};SP.defOn=localStorage.getItem('toto_sp_def')!=='0';
+fetch('assets/pack/pack.json').then(r=>r.ok?r.json():null).then(j=>{if(!j)return;for(const [s] of SP_SLOTS)SP.def[s]=(j[s]||[]).map((x,i)=>({id:'def:'+s+':'+i,url:'assets/pack/'+x.file,text:x.text||'',audio:true,def:true}));const st=$('spSt');if(st&&!st.textContent)st.textContent='';}).catch(()=>{});
 
 /* hooks into game moments */
 { const t0=startTrip;startTrip=function(e,...a){const r=t0.call(this,e,...a);SP.fire('pax',{force:1});return r;};
@@ -54,7 +57,7 @@ SP.loadMeta();
 {const ov=document.createElement('div');ov.id='spk';ov.className='ov hidden';
  ov.innerHTML='<div class="sp-wrap"><div class="sp-head"><b>সাউন্ড প্যাক</b><span>শুধু এই ফোন/কম্পিউটারে থাকে · কোথাও আপলোড হয় না</span></div>'+
   '<div class="sp-bulk"><button class="btn sm" id="spBulk">📦 অনেক ফাইল একসাথে যোগ করো</button><input type="file" id="spBulkIn" accept="audio/*" multiple hidden><div class="sp-note">ফাইলের নাম দেখে ঠিক জায়গায় বসিয়ে দেব (crash, fail, wow…)। পরে সরিয়ে নিতে পারবে।</div></div>'+
-  '<div id="spList"></div><div class="sp-foot"><button class="btn sm alt" id="spOld">🎙 পুরনো লাইন-ভিত্তিক ভয়েস প্যাক</button><button class="btn sm alt" id="spClr">সব মুছে ফেলো</button><button class="btn sm" id="spBack">← ফিরে যাও</button></div></div>';
+  '<div id="spDef" class="sp-sec"></div><div id="spList"></div><div class="sp-foot"><button class="btn sm alt" id="spOld">🎙 পুরনো লাইন-ভিত্তিক ভয়েস প্যাক</button><button class="btn sm alt" id="spClr">সব মুছে ফেলো</button><button class="btn sm" id="spBack">← ফিরে যাও</button></div></div>';
  $('stage').appendChild(ov);
  const list=$('spList');let rec=null;
  function row(slot,it){const r=document.createElement('div');r.className='sp-it';
@@ -64,7 +67,10 @@ SP.loadMeta();
   r.querySelector('.sp-tx').onchange=e=>{it.text=e.target.value.trim();SP.saveMeta();};
   r.querySelector('.sp-mv').onchange=e=>{SP.meta[slot]=SP.meta[slot].filter(x=>x!==it);SP.meta[e.target.value].push(it);SP.saveMeta();draw();};
   r.onclick=e=>{const a=e.target.dataset&&e.target.dataset.a;if(a==='play')SP.playClip(it.id);if(a==='del'){SP.remove(slot,it.id);draw();}};return r;}
- function draw(){list.innerHTML='';for(const [s,n,d] of SP_SLOTS){const sec=document.createElement('div');sec.className='sp-sec';const L=SP.meta[s];
+ function drawDef(){const d=$('spDef');let n=0;for(const s in SP.def)n+=SP.def[s].length;if(!n){d.style.display='none';return;}d.style.display='';
+  d.innerHTML='<div class="sp-st"><b>ডিফল্ট প্যাক</b><small>সাইটের সঙ্গে আসা '+bn(n)+'টা সাউন্ড</small><button class="sp-ic" id="spDefT" style="width:auto;padding:0 10px">'+(SP.defOn?'চালু':'বন্ধ')+'</button></div>';
+  $('spDefT').onclick=()=>{SP.defOn=!SP.defOn;try{localStorage.setItem('toto_sp_def',SP.defOn?'1':'0');}catch(e){}drawDef();};}
+ function draw(){drawDef();list.innerHTML='';for(const [s,n,d] of SP_SLOTS){const sec=document.createElement('div');sec.className='sp-sec';const L=SP.meta[s];
    sec.innerHTML='<div class="sp-st"><b>'+n+'</b><small>'+d+'</small><em>'+(L.length?bn(L.length)+'টা':'')+'</em></div>';
    for(const it of L)sec.appendChild(row(s,it));
    const act=document.createElement('div');act.className='sp-act';act.innerHTML='<button data-k="file">⬆ ফাইল</button><button data-k="rec">🎙 রেকর্ড</button><button data-k="text">✎ শুধু লেখা</button>';
